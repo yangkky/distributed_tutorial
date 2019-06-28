@@ -7,7 +7,7 @@ import torchvision.transforms as transforms
 import torch
 import torch.nn as nn
 import torch.distributed as dist
-from apex.parallel import DistributedDataParallel as DPP
+from apex.parallel import DistributedDataParallel as DDP
 from apex import amp
 
 
@@ -17,6 +17,8 @@ def main():
                         help='number of data loading workers (default: 4)')
     parser.add_argument('-g', '--gpus', default=1, type=int,
                         help='number of gpus per node')
+    parser.add_argument('-nr', '--nr', default=0, type  =int,
+                        help='ranking within the nodes')
     parser.add_argument('--epochs', default=2, type=int, metavar='N',
                         help='number of total epochs to run')
     args = parser.parse_args()
