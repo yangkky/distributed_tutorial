@@ -25,7 +25,7 @@ def main():
     args.world_size = args.gpus * args.nodes
     os.environ['MASTER_ADDR'] = '10.57.23.164'
     os.environ['MASTER_PORT'] = '8888'
-    mp.spawn(main_worker, nprocs=args.gpus, args=(args,))
+    mp.spawn(train, nprocs=args.gpus, args=(args,))
 
 
 class ConvNet(nn.Module):
@@ -51,7 +51,7 @@ class ConvNet(nn.Module):
         return out
 
 
-def main_worker(gpu, args):
+def train(gpu, args):
     rank = args.nr * args.gpus + gpu
     dist.init_process_group(backend='nccl', init_method='env://', world_size=args.world_size, rank=rank)
 

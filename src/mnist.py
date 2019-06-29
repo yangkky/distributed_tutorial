@@ -22,7 +22,7 @@ def main():
     parser.add_argument('--epochs', default=2, type=int, metavar='N',
                         help='number of total epochs to run')
     args = parser.parse_args()
-    main_worker(0, args)
+    train(0, args)
 
 
 class ConvNet(nn.Module):
@@ -48,7 +48,7 @@ class ConvNet(nn.Module):
         return out
 
 
-def main_worker(gpu, args):
+def train(gpu, args):
     model = ConvNet()
     torch.cuda.set_device(gpu)
     model.cuda(gpu)
