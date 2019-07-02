@@ -53,7 +53,11 @@ class ConvNet(nn.Module):
 
 def train(gpu, args):
     rank = args.nr * args.gpus + gpu
-    dist.init_process_group(backend='nccl', init_method='env://', world_size=args.world_size, rank=rank)
+    dist.init_process_group(
+        backend='nccl',
+        init_method='env://',
+        world_size=args.world_size,
+        rank=rank)
 
     model = ConvNet()
     torch.cuda.set_device(gpu)
@@ -66,19 +70,24 @@ def train(gpu, args):
     model, optimizer = amp.initialize(model, optimizer, opt_level='O2')
     model = DDP(model)
     # Data loading code
-    train_dataset = torchvision.datasets.MNIST(root='./data',
-                                               train=True,
-                                               transform=transforms.ToTensor(),
-                                               download=True)
-    train_sampler = torch.utils.data.distributed.DistributedSampler(train_dataset,
-                                                                    num_replicas=args.world_size,
-                                                                    rank=rank)
-    train_loader = torch.utils.data.DataLoader(dataset=train_dataset,
-                                               batch_size=batch_size,
-                                               shuffle=False,
-                                               num_workers=0,
-                                               pin_memory=True,
-                                               sampler=train_sampler)
+    train_dataset = torchvision.datasets.MNIST(
+        root='./data',
+        train=True,
+        transform=transforms.ToTensor(),
+        download=True
+    )
+    train_sampler = torch.utils.data.distributed.DistributedSampler(
+        train_dataset,
+        num_replicas=args.world_size,
+        rank=rank)
+    train_loader = torch.utils.data.DataLoader(
+        dataset=train_dataset,
+        batch_size=batch_size,
+        shuffle=False,
+        num_workers=0,
+        pin_memory=True,
+        sampler=train_sampler
+    )
 
     start = datetime.now()
     total_step = len(train_loader)
@@ -96,8 +105,13 @@ def train(gpu, args):
                 scaled_loss.backward()
             optimizer.step()
             if (i + 1) % 100 == 0 and gpu == 0:
-                print('Epoch [{}/{}], Step [{}/{}], Loss: {:.4f}'.format(epoch + 1, args.epochs, i + 1, total_step,
-                                                                         loss.item()))
+                print('Epoch [{}/{}], Step [{}/{}], Loss: {:.4f}'.format(
+                    epoch + 1,
+                    args.epochs,
+                    i + 1,
+                    total_step,
+                    loss.item())
+                )
     if gpu == 0:
         print("Training complete in: " + str(datetime.now() - start))
 
