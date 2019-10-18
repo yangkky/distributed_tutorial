@@ -58,7 +58,7 @@ def train(gpu, args):
         init_method='env://',
         world_size=args.world_size,
         rank=rank)
-
+    torch.manual_seed(0)
     model = ConvNet()
     torch.cuda.set_device(gpu)
     model.cuda(gpu)
