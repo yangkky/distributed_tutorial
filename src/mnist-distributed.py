@@ -54,7 +54,7 @@ class ConvNet(nn.Module):
 def train(gpu, args):
     rank = args.nr * args.gpus + gpu
     dist.init_process_group(backend='nccl', init_method='env://', world_size=args.world_size, rank=rank)
-
+    torch.manual_seed(0)
     model = ConvNet()
     torch.cuda.set_device(gpu)
     model.cuda(gpu)
